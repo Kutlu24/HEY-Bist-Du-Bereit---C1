@@ -1,0 +1,974 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deutsch Vokabeltrainer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #667eea;
+            --secondary: #764ba2;
+            --success: #4ade80;
+            --warning: #fbbf24;
+            --danger: #f87171;
+            --info: #38bdf8;
+            --purple: #a855f7;
+            --pink: #ec4899;
+            --orange: #fb923c;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(-45deg, #667eea, #764ba2, #f093fb, #4facfe);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            animation: fadeInDown 0.6s ease;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-item {
+            background: rgba(255,255,255,0.25);
+            padding: 15px 20px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255,255,255,0.3);
+            transition: all 0.3s;
+            text-align: center;
+        }
+
+        .stat-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            background: rgba(255,255,255,0.35);
+        }
+
+        .stat-item strong {
+            display: block;
+            font-size: 1.8rem;
+            margin-top: 5px;
+        }
+
+        .daily-goal {
+            background: linear-gradient(135deg, var(--success), var(--info));
+            color: white;
+            padding: 15px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .goal-progress {
+            width: 100%;
+            height: 10px;
+            background: rgba(255,255,255,0.3);
+            border-radius: 10px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+
+        .goal-progress-fill {
+            height: 100%;
+            background: white;
+            transition: width 0.5s ease;
+            border-radius: 10px;
+        }
+
+        .controls {
+            background: white;
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+            margin-bottom: 25px;
+            animation: fadeInUp 0.6s ease;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .tab {
+            padding: 12px 24px;
+            border: none;
+            background: linear-gradient(135deg, #f0f0f0, #e0e0e0);
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tab::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.5), transparent);
+            transition: left 0.5s;
+        }
+
+        .tab:hover::before {
+            left: 100%;
+        }
+
+        .tab.active {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(102,126,234,0.4);
+        }
+
+        .filters {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        label {
+            font-weight: 600;
+            color: #555;
+            font-size: 14px;
+        }
+
+        select, input {
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        select:focus, input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(102,126,234,0.1);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        button::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        button:active::after {
+            width: 300px;
+            height: 300px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #f0f0f0, #e0e0e0);
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background: linear-gradient(135deg, #e0e0e0, #d0d0d0);
+            transform: translateY(-2px);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, var(--success), #22c55e);
+            color: white;
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, var(--warning), #f59e0b);
+            color: white;
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, var(--danger), #ef4444);
+            color: white;
+        }
+
+        .card {
+            background: white;
+            border-radius: 25px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 50px;
+            min-height: 400px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+        }
+
+        #typingCard, #reviewCard {
+            cursor: default;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(102,126,234,0.1), transparent);
+            transform: rotate(45deg);
+            transition: all 0.6s;
+        }
+
+        .card:hover::before {
+            top: -100%;
+            left: -100%;
+        }
+
+        .card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 30px 80px rgba(0,0,0,0.4);
+        }
+
+        .card-front, .card-back {
+            width: 100%;
+        }
+
+        .card-word {
+            font-size: 2.8rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), var(--secondary), var(--pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 20px;
+            animation: wordPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes wordPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .card-grammar {
+            font-size: 1.2rem;
+            color: var(--purple);
+            margin-bottom: 15px;
+            font-style: italic;
+            font-weight: 500;
+        }
+
+        .card-example {
+            font-size: 1.3rem;
+            color: #555;
+            line-height: 1.8;
+            padding: 25px;
+            background: linear-gradient(135deg, #f9f9f9, #f0f0f0);
+            border-radius: 15px;
+            margin-top: 20px;
+            border-left: 4px solid var(--primary);
+        }
+
+        .card-meta {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 8px 18px;
+            border-radius: 25px;
+            font-size: 14px;
+            font-weight: 600;
+            box-shadow: 0 3px 10px rgba(102,126,234,0.3);
+        }
+
+        .favorite-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            font-size: 2rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            z-index: 10;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+        }
+
+        .favorite-btn:hover {
+            transform: scale(1.3) rotate(15deg);
+        }
+
+        .favorite-btn.active {
+            animation: starBounce 0.5s ease;
+        }
+
+        @keyframes starBounce {
+            0%, 100% { transform: scale(1) rotate(0deg); }
+            50% { transform: scale(1.5) rotate(180deg); }
+        }
+
+        .audio-btn {
+            background: linear-gradient(135deg, var(--info), var(--primary));
+            color: white;
+            border: none;
+            padding: 18px 35px;
+            border-radius: 50px;
+            font-size: 18px;
+            cursor: pointer;
+            margin-top: 20px;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s;
+            box-shadow: 0 5px 20px rgba(56,189,248,0.4);
+        }
+
+        .audio-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 8px 30px rgba(56,189,248,0.6);
+        }
+
+        .audio-btn.playing {
+            animation: audioWave 1s ease-in-out infinite;
+        }
+
+        @keyframes audioWave {
+            0%, 100% { box-shadow: 0 5px 20px rgba(56,189,248,0.4); }
+            50% { box-shadow: 0 8px 40px rgba(56,189,248,0.8); }
+        }
+
+        /* Ses Seçici Satırı */
+        .voice-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-top: 14px;
+            padding-top: 14px;
+            border-top: 1px solid #e5e7eb;
+            flex-wrap: wrap;
+        }
+        .voice-label {
+            font-weight: 700;
+            color: #555;
+            font-size: 14px;
+            white-space: nowrap;
+        }
+        .voice-row select {
+            flex: 1;
+            min-width: 160px;
+            padding: 10px 12px;
+            border-radius: 12px;
+            border: 2px solid #e0e0e0;
+            font-size: 14px;
+            font-weight: 600;
+            background: #fff;
+            cursor: pointer;
+        }
+        .voice-row select:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        .voice-test-btn {
+            padding: 10px 18px;
+            border-radius: 12px;
+            border: 2px solid #e0e0e0;
+            background: #f3f4f6;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background 0.2s;
+            white-space: nowrap;
+        }
+        .voice-test-btn:hover { background: #e5e7eb; }
+
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 25px;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .quiz-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+            width: 100%;
+        }
+
+        .quiz-option {
+            padding: 25px;
+            background: linear-gradient(135deg, #f9f9f9, #f0f0f0);
+            border: 3px solid transparent;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        .quiz-option:hover {
+            background: linear-gradient(135deg, #e0e0e0, #d0d0d0);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .quiz-option.correct {
+            background: linear-gradient(135deg, var(--success), #22c55e);
+            color: white;
+            border-color: #16a34a;
+            animation: correctAnswer 0.5s ease;
+        }
+
+        @keyframes correctAnswer {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        .quiz-option.wrong {
+            background: linear-gradient(135deg, var(--danger), #ef4444);
+            color: white;
+            border-color: #dc2626;
+            animation: shake 0.5s ease;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        .typing-quiz-input {
+            width: 100%;
+            padding: 20px;
+            font-size: 1.5rem;
+            text-align: center;
+            border: 3px solid var(--primary);
+            border-radius: 15px;
+            margin-top: 20px;
+            transition: all 0.3s;
+            position: relative;
+            z-index: 100;
+            cursor: text;
+            pointer-events: auto;
+            background: white;
+        }
+
+        .typing-quiz-input:focus {
+            outline: none;
+            border-color: var(--secondary);
+            box-shadow: 0 0 0 5px rgba(102,126,234,0.2);
+        }
+
+        .typing-quiz-input.correct {
+            border-color: var(--success);
+            background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+        }
+
+        .typing-quiz-input.wrong {
+            border-color: var(--danger);
+            background: linear-gradient(135deg, #fef2f2, #fee2e2);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background: rgba(255,255,255,0.3);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 20px;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--success), var(--info), var(--primary));
+            background-size: 200% 100%;
+            animation: progressFlow 2s linear infinite;
+            transition: width 0.5s ease;
+            border-radius: 10px;
+        }
+
+        @keyframes progressFlow {
+            0% { background-position: 0% 0%; }
+            100% { background-position: 200% 0%; }
+        }
+
+        .flip-hint {
+            position: absolute;
+            bottom: 20px;
+            font-size: 14px;
+            color: #999;
+            animation: bounce 2s ease-in-out infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .stats-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+        }
+
+        .stats-content {
+            background: white;
+            padding: 40px;
+            border-radius: 25px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            animation: modalSlideIn 0.4s ease;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .stats-content h2 {
+            color: var(--primary);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .stat-row:last-child {
+            border-bottom: none;
+        }
+
+        .chart-container {
+            margin: 20px 0;
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 15px;
+        }
+
+        .bar-chart {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-around;
+            height: 200px;
+            gap: 10px;
+        }
+
+        .bar {
+            flex: 1;
+            background: linear-gradient(to top, var(--primary), var(--secondary));
+            border-radius: 10px 10px 0 0;
+            position: relative;
+            transition: all 0.3s;
+            min-width: 30px;
+        }
+
+        .bar:hover {
+            opacity: 0.8;
+            transform: scaleY(1.05);
+        }
+
+        .bar-label {
+            position: absolute;
+            bottom: -25px;
+            width: 100%;
+            text-align: center;
+            font-size: 12px;
+            color: #666;
+        }
+
+        .bar-value {
+            position: absolute;
+            top: -25px;
+            width: 100%;
+            text-align: center;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.2rem;
+            }
+            .card-word {
+                font-size: 2.2rem;
+            }
+            .card {
+                padding: 30px 20px;
+            }
+            .stats {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🇩🇪 Deutsch Vokabeltrainer</h1>
+            <div class="stats">
+                <div class="stat-item">
+                    📚 Gesamt<strong id="totalWords">0</strong>
+                </div>
+                <div class="stat-item">
+                    ✅ Gelernt<strong id="learnedWords">0</strong>
+                </div>
+                <div class="stat-item">
+                    🎯 Übrig<strong id="remainingWords">0</strong>
+                </div>
+                <div class="stat-item">
+                    ⭐ Favoriten<strong id="favoriteWords">0</strong>
+                </div>
+            </div>
+        </header>
+
+        <div class="daily-goal">
+            <div>🎯 Tägliches Ziel: <strong id="dailyGoalText">10 Wörter</strong></div>
+            <div>Heute gelernt: <strong id="todayLearned">0</strong> / <strong id="dailyGoalNumber">10</strong></div>
+            <div class="goal-progress">
+                <div class="goal-progress-fill" id="goalProgressFill" style="width: 0%"></div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <div class="tabs">
+                <button class="tab active" data-mode="flashcard">📇 Lernkarten</button>
+                <button class="tab" data-mode="quiz">🎯 Multiple Choice</button>
+                <button class="tab" data-mode="typing">⌨️ Schreib-Quiz</button>
+                <button class="tab" data-mode="review">🔄 Wiederholung</button>
+            </div>
+
+            <div class="filters">
+                <div class="filter-group">
+                    <label for="lektionFilter">Lektion</label>
+                    <select id="lektionFilter">
+                        <option value="all">Alle</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="teilFilter">Teil</label>
+                    <select id="teilFilter">
+                        <option value="all">Alle</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="searchInput">Suchen</label>
+                    <input type="text" id="searchInput" placeholder="Wort suchen...">
+                </div>
+                <div class="filter-group">
+                    <label for="favoriteFilter">Filter</label>
+                    <select id="favoriteFilter">
+                        <option value="all">Alle Wörter</option>
+                        <option value="favorites">Nur Favoriten</option>
+                        <option value="notLearned">Nicht gelernt</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <button class="btn-primary" id="shuffleBtn">🔀 Mischen</button>
+                <button class="btn-secondary" id="statsBtn">📊 Statistiken</button>
+                <button class="btn-secondary" onclick="window.location.href='index.html'">🏠 Home</button>
+                <button class="btn-secondary" id="resetProgressBtn">🔄 Zurücksetzen</button>
+            </div>
+
+            <!-- Ses Seçici -->
+            <div class="voice-row">
+                <label class="voice-label">🔊 Stimme (TTS)</label>
+                <select id="voiceSelect" onchange="_setVoice(this.value)">
+                    <option>Wird geladen...</option>
+                </select>
+                <button class="voice-test-btn" onclick="_ttsSpeak(['Guten Tag, ich lerne Deutsch!'])">▶ Test</button>
+            </div>
+        </div>
+
+        <!-- Lernkarten Modus -->
+        <div id="flashcardMode">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+            </div>
+
+            <div class="card" id="flashcard">
+                <button class="favorite-btn" id="favoriteBtn">☆</button>
+                <div class="card-front" id="cardFront">
+                    <div class="card-word" id="wordText">Wörter werden geladen...</div>
+                    <div class="card-meta">
+                        <span class="badge" id="lektionBadge">Lektion -</span>
+                        <span class="badge" id="teilBadge">Teil -</span>
+                    </div>
+                    <button class="audio-btn" id="audioBtn">
+                        🔊 Anhören
+                    </button>
+                    <div class="flip-hint">👆 Klicken zum Umdrehen</div>
+                </div>
+                <div class="card-back hidden" id="cardBack">
+                    <div class="card-word" id="wordTextBack"></div>
+                    <div class="card-grammar" id="grammarText"></div>
+                    <div class="card-example" id="exampleText"></div>
+                    <div class="card-meta">
+                        <span class="badge" id="lektionBadgeBack">Lektion -</span>
+                        <span class="badge" id="teilBadgeBack">Teil -</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="navigation">
+                <button class="btn-secondary" id="prevBtn">⬅️ Zurück</button>
+                <button class="btn-primary" id="markLearnedBtn">✅ Gelernt</button>
+                <button class="btn-secondary" id="nextBtn">Weiter ➡️</button>
+            </div>
+        </div>
+
+        <!-- Multiple Choice Quiz -->
+        <div id="quizMode" class="hidden">
+            <div class="progress-bar">
+                <div class="progress-fill" id="quizProgressFill" style="width: 0%"></div>
+            </div>
+
+            <div class="card" id="quizCard">
+                <div class="card-word" id="quizWord">Quiz wird geladen...</div>
+                <button class="audio-btn" id="quizAudioBtn">
+                    🔊 Anhören
+                </button>
+                <div class="quiz-options" id="quizOptions"></div>
+            </div>
+
+            <div class="navigation">
+                <button class="btn-secondary" id="quizPrevBtn">⬅️ Zurück</button>
+                <div style="text-align: center;">
+                    <strong id="quizScore">Punktzahl: 0/0</strong>
+                </div>
+                <button class="btn-secondary" id="quizNextBtn">Weiter ➡️</button>
+            </div>
+        </div>
+
+        <!-- Schreib-Quiz -->
+        <div id="typingMode" class="hidden">
+            <div class="progress-bar">
+                <div class="progress-fill" id="typingProgressFill" style="width: 0%"></div>
+            </div>
+
+            <div class="card" id="typingCard">
+                <div class="card-grammar" id="typingGrammar">Grammatik</div>
+                <div class="card-example" id="typingExample">Beispielsatz</div>
+                <button class="audio-btn" id="typingAudioBtn">
+                    🔊 Anhören
+                </button>
+                <input type="text" class="typing-quiz-input" id="typingInput" placeholder="Schreiben Sie das Wort..." autocomplete="off">
+                <div style="margin-top: 20px;">
+                    <button class="btn-primary" id="typingCheckBtn">✓ Prüfen</button>
+                    <button class="btn-secondary" id="typingSkipBtn">→ Überspringen</button>
+                </div>
+            </div>
+
+            <div class="navigation">
+                <button class="btn-secondary" id="typingPrevBtn">⬅️ Zurück</button>
+                <div style="text-align: center;">
+                    <strong id="typingScore">Punktzahl: 0/0</strong>
+                </div>
+                <button class="btn-secondary" id="typingNextBtn">Weiter ➡️</button>
+            </div>
+        </div>
+
+        <!-- Wiederholung -->
+        <div id="reviewMode" class="hidden">
+            <div class="progress-bar">
+                <div class="progress-fill" id="reviewProgressFill" style="width: 0%"></div>
+            </div>
+
+            <div class="card" id="reviewCard">
+                <button class="favorite-btn" id="reviewFavoriteBtn">☆</button>
+                <div class="card-word" id="reviewWord">Keine Wörter zur Wiederholung</div>
+                <div class="card-grammar" id="reviewGrammar"></div>
+                <div class="card-example" id="reviewExample"></div>
+                <button class="audio-btn" id="reviewAudioBtn">
+                    🔊 Anhören
+                </button>
+                <div style="margin-top: 30px;">
+                    <p>Erinnerst du dich an dieses Wort?</p>
+                    <div style="display: flex; gap: 10px; margin-top: 15px; justify-content: center; flex-wrap: wrap;">
+                        <button class="btn-danger" id="reviewHardBtn">😰 Schwer</button>
+                        <button class="btn-warning" id="reviewMediumBtn">🤔 Mittel</button>
+                        <button class="btn-success" id="reviewEasyBtn">😊 Leicht</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistik Modal -->
+    <div id="statsModal" class="stats-modal hidden">
+        <div class="stats-content">
+            <h2>📊 Lernstatistiken</h2>
+            <div class="stat-row">
+                <span>Gesamtwörter:</span>
+                <strong id="statTotal">0</strong>
+            </div>
+            <div class="stat-row">
+                <span>Gelernte Wörter:</span>
+                <strong id="statLearned">0</strong>
+            </div>
+            <div class="stat-row">
+                <span>Favoriten:</span>
+                <strong id="statFavorites">0</strong>
+            </div>
+            <div class="stat-row">
+                <span>Heute gelernt:</span>
+                <strong id="statToday">0</strong>
+            </div>
+            <div class="stat-row">
+                <span>Fortschritt:</span>
+                <strong id="statProgress">0%</strong>
+            </div>
+
+            <div class="chart-container">
+                <h3 style="margin-bottom: 15px;">Gelernte Wörter pro Lektion</h3>
+                <div class="bar-chart" id="lektionChart"></div>
+            </div>
+
+            <div style="margin-top: 30px; text-align: center;">
+                <button class="btn-primary" id="closeStatsBtn">Schließen</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deutsch C1 Vokabeltrainer - Modulauswahl</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(-45deg, #667eea, #764ba2, #f093fb, #4facfe);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .container {
+            max-width: 1000px;
+            width: 100%;
+        }
+
+        header {
+            text-align: center;
+            color: white;
+            margin-bottom: 50px;
+        }
+
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            animation: fadeInDown 0.8s ease;
+        }
+
+        .subtitle {
+            font-size: 1.3rem;
+            opacity: 0.95;
+            font-weight: 300;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modules {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .module-card {
+            background: white;
+            border-radius: 25px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            animation: fadeInUp 0.8s ease;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .module-card:hover {
+            transform: translateY(-10px) scale(1.03);
+            box-shadow: 0 30px 80px rgba(0,0,0,0.4);
+        }
+
+        .module-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+        }
+
+        .module-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+        }
+
+        .module-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .module-subtitle {
+            font-size: 1.1rem;
+            color: #666;
+            margin-bottom: 25px;
+        }
+
+        .module-features {
+            text-align: left;
+            margin: 25px 0;
+        }
+
+        .feature {
+            padding: 10px 0;
+            color: #555;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .feature-icon {
+            font-size: 1.2rem;
+        }
+
+        .module-stats {
+            background: linear-gradient(135deg, #f0f0f0, #e0e0e0);
+            padding: 15px;
+            border-radius: 15px;
+            margin: 20px 0;
+        }
+
+        .stat {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .module-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 15px;
+            width: 100%;
+        }
+
+        .module-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.5);
+        }
+
+        .badge {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #4ade80, #22c55e);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.2rem;
+            }
+            .modules {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🇩🇪 Deutsch C1 Vokabeltrainer</h1>
+            <p class="subtitle">Wähle deinen Lernmodus</p>
+        </header>
+
+        <div class="modules">
+            <!-- Modul 1: Vokabelliste -->
+            <div class="module-card" onclick="window.location.href='vokabelliste.html'">
+                <span class="badge">Mit Audio</span>
+                <div class="module-icon">📚</div>
+                <h2 class="module-title">Modul 1</h2>
+                <p class="module-subtitle">Vokabelliste</p>
+                
+                <div class="module-stats">
+                    <div class="stat">626 Wörter</div>
+                </div>
+
+                <div class="module-features">
+                    <div class="feature">
+                        <span class="feature-icon">🔊</span>
+                        <span>Audio für 625 Wörter</span>
+                    </div>
+                    <div class="feature">
+                        <span class="feature-icon">📝</span>
+                        <span>Alle mit Beispielsätzen</span>
+                    </div>
+                    <div class="feature">
+                        <span class="feature-icon">📖</span>
+                        <span>Lektion 1-10, Teil 1-8</span>
+                    </div>
+                    <div class="feature">
+                        <span class="feature-icon">🎯</span>
+                        <span>4 Quiz-Modi</span>
+                    </div>
+                </div>
+
+                <button class="module-btn">Starten →</button>
+            </div>
+
+            <!-- Modul 2: Aspekt Neu C1 -->
+            <div class="module-card" onclick="window.location.href='aspekt-neu.html'">
+                <span class="badge">6 Sprachen</span>
+                <div class="module-icon">🌍</div>
+                <h2 class="module-title">Modul 2</h2>
+                <p class="module-subtitle">Aspekt Neu C1</p>
+                
+                <div class="module-stats">
+                    <div class="stat">879 Wörter</div>
+                </div>
+
+                <div class="module-features">
+                    <div class="feature">
+                        <span class="feature-icon">🌐</span>
+                        <span>6 Sprachen verfügbar</span>
+                    </div>
+                    <div class="feature">
+                        <span class="feature-icon">🇹🇷🇨🇳🇮🇷</span>
+                        <span>TR, CN, FA, AM, KU, UK</span>
+                    </div>
+                    <div class="feature">
+                        <span class="feature-icon">📖</span>
+                        <span>Kapitel 1-10</span>
+                    </div>
+                    <div class="feature">
+                        <span class="feature-icon">🎯</span>
+                        <span>Mehrsprachige Quiz</span>
+                    </div>
+                </div>
+
+                <button class="module-btn">Starten →</button>
+            </div>
+        </div>
+
+        <div style="text-align: center; margin-top: 40px; color: white; font-size: 1.1rem;">
+            <p>📊 Gesamt: <strong>1505 Wörter</strong> für dein C1-Niveau</p>
+        </div>
+    </div>
+</body>
+</html>

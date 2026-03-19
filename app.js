@@ -322,42 +322,41 @@ function _ttsSpeak(parts) {
 // Ana ses fonksiyonu — B2 sistemiyle aynı mantık
 // isFront=true  → opus oynar, bittikten sonra TTS(grammatik + beispiel)
 // isFront=false → sadece TTS(beispiel)
-function playAudio(audioFile, grammatik, beispiel, isFront) {
+function playAudio(audioFile, wort, grammatik, beispiel, isFront) {
     if (window.speechSynthesis) window.speechSynthesis.cancel();
 
     if (isFront === false) {
-        // Arka yüz: sadece beispiel oku
-        _ttsSpeak([beispiel || ""]);
+        // Arka yüz: grammatik + beispiel oku
+        _ttsSpeak([grammatik || "", beispiel || ""].filter(Boolean));
         return;
     }
 
-    // Ön yüz veya genel çağrı: önce opus, sonra TTS
+    // Ön yüz: önce opus, opus bittikten sonra TTS(wort + grammatik + beispiel)
+    const ttsAfter = [wort || "", grammatik || "", beispiel || ""].filter(Boolean);
+
     if (audioFile) {
         const audio = new Audio(`sesler/${audioFile}`);
         const btn = document.getElementById("audioBtn");
         if (btn) btn.classList.add("playing");
 
-        audio.onended = () => {
+        let ttsStarted = false;
+        const startTTS = () => {
+            if (ttsStarted) return;  // çift tetiklenmeyi önle
+            ttsStarted = true;
             if (btn) btn.classList.remove("playing");
-            // Opus bitti → TTS: grammatik + beispiel
-            const parts = [grammatik, beispiel].filter(Boolean);
-            if (parts.length) _ttsSpeak(parts);
+            if (ttsAfter.length) _ttsSpeak(ttsAfter);
         };
-        audio.onerror = () => {
-            if (btn) btn.classList.remove("playing");
-            // Dosya yoksa direkt TTS
-            const parts = [grammatik, beispiel].filter(Boolean);
-            if (parts.length) _ttsSpeak(parts);
-        };
-        audio.play().catch(() => {
-            if (btn) btn.classList.remove("playing");
-            const parts = [grammatik, beispiel].filter(Boolean);
-            if (parts.length) _ttsSpeak(parts);
-        });
+
+        audio.onended = startTTS;
+        audio.onerror = startTTS;
+
+        const playPromise = audio.play();
+        if (playPromise !== undefined) {
+            playPromise.catch(startTTS);
+        }
     } else {
-        // Opus dosyası yoksa direkt TTS
-        const parts = [grammatik, beispiel].filter(Boolean);
-        if (parts.length) _ttsSpeak(parts);
+        // Opus yoksa direkt TTS
+        if (ttsAfter.length) _ttsSpeak(ttsAfter);
     }
 }
 
@@ -637,22 +636,22 @@ document.getElementById('audioBtn').addEventListener('click', (e) => {
     e.stopPropagation();
     const word = filteredWords[currentIndex];
     // isFront: kartın şu anki durumuna göre
-    playAudio(word?.audio, word?.grammatik, word?.beispiel, !isFlipped);
+    playAudio(word?.audio, word?.wort, word?.grammatik, word?.beispiel, !isFlipped);
 });
 
 document.getElementById('quizAudioBtn').addEventListener('click', () => {
     const word = filteredWords[currentIndex];
-    playAudio(word?.audio, word?.grammatik, word?.beispiel, true);
+    playAudio(word?.audio, word?.wort, word?.grammatik, word?.beispiel, true);
 });
 
 document.getElementById('typingAudioBtn').addEventListener('click', () => {
     const word = filteredWords[currentIndex];
-    playAudio(word?.audio, word?.grammatik, word?.beispiel, true);
+    playAudio(word?.audio, word?.wort, word?.grammatik, word?.beispiel, true);
 });
 
 document.getElementById('reviewAudioBtn').addEventListener('click', () => {
     const word = filteredWords[currentIndex];
-    playAudio(word?.audio, word?.grammatik, word?.beispiel, true);
+    playAudio(word?.audio, word?.wort, word?.grammatik, word?.beispiel, true);
 });
 
 document.getElementById('prevBtn').addEventListener('click', () => {
@@ -778,7 +777,7 @@ document.addEventListener('keydown', (e) => {
         } else if (e.key === 'Enter') {
             e.preventDefault();
             const word = filteredWords[currentIndex];
-            playAudio(word?.audio, word?.grammatik, word?.beispiel, !isFlipped);
+            playAudio(word?.audio, word?.wort, word?.grammatik, word?.beispiel, !isFlipped);
         } else if (e.key === 'f' || e.key === 'F') {
             e.preventDefault();
             toggleFavorite();
